@@ -13,6 +13,9 @@ export class TimelineView extends ItemView {
   private plugin: RecentNotesTimelinePlugin;
   private contentEl: HTMLElement;
   private refreshInterval: number;
+  
+  // This icon will be shown in the tab header
+  icon = 'clock';
 
   constructor(leaf: WorkspaceLeaf, plugin: RecentNotesTimelinePlugin) {
     super(leaf);
@@ -34,8 +37,22 @@ export class TimelineView extends ItemView {
     
     // Create a header with a refresh button
     const header = container.createDiv({ cls: 'timeline-header' });
-    const title = header.createEl('h3', { text: 'Recent Notes Timeline' });
     
+    // Add a title
+    const titleContainer = header.createDiv({ cls: 'timeline-title-container' });
+    const title = titleContainer.createEl('h2', { 
+      cls: 'timeline-title',
+      text: 'Recent Notes Timeline' 
+    });
+    const subtitle = titleContainer.createEl('p', { 
+      cls: 'timeline-subtitle',
+      text: 'Your latest updates and creations' 
+    });
+    
+    // Add stats container
+    const statsContainer = header.createDiv({ cls: 'timeline-stats' });
+    
+    // Add refresh button
     const refreshButton = header.createEl('button', {
       cls: 'timeline-refresh-button',
       attr: { 'aria-label': 'Refresh timeline' }
@@ -49,10 +66,57 @@ export class TimelineView extends ItemView {
     // Load the initial timeline data
     await this.refreshTimeline();
     
+    // Update stats after loading data
+    this.updateStats(statsContainer);
+    
     // Set up auto-refresh every 5 minutes
     this.refreshInterval = window.setInterval(() => {
-      this.refreshTimeline();
+      this.refreshTimeline().then(() => {
+        this.updateStats(statsContainer);
+      });
     }, 5 * 60 * 1000);
+    
+    // Register an event handler to refresh when files change
+    this.registerEvent(
+      this.app.vault.on('modify', () => {
+        this.refreshTimeline().then(() => {
+          this.updateStats(statsContainer);
+        });
+      })
+    );
+    
+    this.registerEvent(
+      this.app.vault.on('create', () => {
+        this.refreshTimeline().then(() => {
+          this.updateStats(statsContainer);
+        });
+      })
+    );
+  }
+  
+  private updateStats(container: HTMLElement) {
+    container.empty();
+    
+    const files = this.app.vault.getMarkdownFiles();
+    const now = Date.now();
+    const dayInMs = 24 * 60 * 60 * 1000;
+    
+    // Count files modified in the last day, week, and month
+    const lastDay = files.filter(file => (now - file.stat.mtime) < dayInMs).length;
+    const lastWeek = files.filter(file => (now - file.stat.mtime) < 7 * dayInMs).length;
+    const lastMonth = files.filter(file => (now - file.stat.mtime) < 30 * dayInMs).length;
+    
+    const daySpan = container.createSpan({ cls: 'timeline-stat' });
+    daySpan.createSpan({ cls: 'timeline-stat-value', text: lastDay.toString() });
+    daySpan.createSpan({ cls: 'timeline-stat-label', text: ' today' });
+    
+    const weekSpan = container.createSpan({ cls: 'timeline-stat' });
+    weekSpan.createSpan({ cls: 'timeline-stat-value', text: lastWeek.toString() });
+    weekSpan.createSpan({ cls: 'timeline-stat-label', text: ' this week' });
+    
+    const monthSpan = container.createSpan({ cls: 'timeline-stat' });
+    monthSpan.createSpan({ cls: 'timeline-stat-value', text: lastMonth.toString() });
+    monthSpan.createSpan({ cls: 'timeline-stat-label', text: ' this month' });
   }
 
   async onClose() {
@@ -130,8 +194,18 @@ export class TimelineView extends ItemView {
       // Create the note info section
       const infoSection = entry.createDiv({ cls: 'timeline-entry-info' });
       
+      // Add action indicator icon
+      const iconContainer = infoSection.createDiv({ cls: 'timeline-entry-icon' });
+      const iconEl = iconContainer.createEl('span', {
+        cls: `timeline-entry-icon-inner ${note.isCreated ? 'created' : 'modified'}`
+      });
+      iconEl.innerHTML = note.isCreated ? '✨' : '✏️';
+      
+      // Add main content container
+      const contentSection = infoSection.createDiv({ cls: 'timeline-entry-content' });
+      
       // Add file name as a link
-      const titleEl = infoSection.createEl('a', {
+      const titleEl = contentSection.createEl('a', {
         cls: 'timeline-entry-title',
         text: note.file.basename,
         attr: {
@@ -146,24 +220,69 @@ export class TimelineView extends ItemView {
         this.app.workspace.openLinkText(note.file.path, '', false);
       });
       
-      // Add a timestamp
-      const timeEl = infoSection.createEl('span', {
-        cls: 'timeline-entry-time',
-        text: date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-      });
+      // Add action indicator and timestamp
+      const metaInfo = contentSection.createDiv({ cls: 'timeline-entry-meta' });
       
-      // Add action indicator (created or modified)
-      const actionEl = infoSection.createEl('span', {
+      // Action text
+      const actionEl = metaInfo.createEl('span', {
         cls: 'timeline-entry-action',
         text: note.isCreated ? 'Created' : 'Modified'
       });
       
-      // Add a preview of the content (optional, could be heavy)
-      // For now, we'll just show the file path
-      const pathEl = entry.createEl('div', {
+      // Add a timestamp
+      const timeEl = metaInfo.createEl('span', {
+        cls: 'timeline-entry-time',
+        text: date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      });
+      
+      // Try to get a preview of the content
+      this.getFilePreview(note.file).then(preview => {
+        if (preview) {
+          const previewEl = entry.createDiv({
+            cls: 'timeline-entry-preview',
+            text: preview
+          });
+        }
+      });
+      
+      // Add file path
+      const pathEl = entry.createDiv({
         cls: 'timeline-entry-path',
         text: note.file.path
       });
+      
+      // Add a subtle open button
+      const actionButton = entry.createDiv({ cls: 'timeline-entry-button' });
+      const openButton = actionButton.createEl('button', {
+        cls: 'timeline-open-button',
+        text: 'Open',
+        attr: { 'aria-label': 'Open note' }
+      });
+      
+      openButton.addEventListener('click', (event) => {
+        event.preventDefault();
+        this.app.workspace.openLinkText(note.file.path, '', false);
+      });
+    }
+  }
+  
+  // Helper method to get a preview of the file content
+  private async getFilePreview(file: TFile): Promise<string | null> {
+    try {
+      // Read the first 200 characters from the file
+      const content = await this.app.vault.read(file);
+      const preview = content.slice(0, 200).trim();
+      
+      // Remove markdown formatting for cleaner preview
+      return preview
+        .replace(/#+ /g, '') // Remove headers
+        .replace(/\*\*(.*?)\*\*/g, '$1') // Remove bold
+        .replace(/\*(.*?)\*/g, '$1') // Remove italics
+        .replace(/\[(.*?)\]\(.*?\)/g, '$1') // Remove links
+        .replace(/\n/g, ' ') // Replace newlines with spaces
+        .slice(0, 140) + (preview.length > 140 ? '...' : '');
+    } catch (error) {
+      return null;
     }
   }
 }

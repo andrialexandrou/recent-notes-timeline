@@ -9,7 +9,7 @@ export default class RecentNotesTimelinePlugin extends Plugin {
       (leaf) => new TimelineView(leaf, this)
     );
 
-    // Add the view to the right sidebar
+    // Add a ribbon icon to open the timeline in a new tab
     this.addRibbonIcon('clock', 'Recent Notes Timeline', () => {
       this.activateView();
     });
@@ -21,6 +21,14 @@ export default class RecentNotesTimelinePlugin extends Plugin {
       callback: () => {
         this.activateView();
       },
+    });
+    
+    // Set as a default view when no other tabs are open
+    this.app.workspace.onLayoutReady(() => {
+      // If there are no open leaf tabs, open the timeline
+      if (this.app.workspace.getLeavesOfType('markdown').length === 0) {
+        this.activateView();
+      }
     });
   }
 
@@ -37,8 +45,8 @@ export default class RecentNotesTimelinePlugin extends Plugin {
       return;
     }
 
-    // Otherwise, create a new leaf in the right sidebar
-    const leaf = this.app.workspace.getRightLeaf(false);
+    // Create a new leaf in the main editor area
+    const leaf = this.app.workspace.getLeaf('tab');
     await leaf.setViewState({
       type: VIEW_TYPE_TIMELINE,
       active: true,
