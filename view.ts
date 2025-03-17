@@ -32,11 +32,18 @@ export class TimelineView extends ItemView {
   }
 
   async onOpen() {
-    // Create container for the timeline
-    const container = this.contentEl.createDiv({ cls: 'recent-notes-timeline' });
+    // Use the entire container for the content
+    const container = this.containerEl.children[1];
+    container.empty();
+    
+    // Add the timeline class to the main container
+    container.addClass('recent-notes-timeline');
+    
+    // Create a content wrapper with proper width constraints
+    const contentWrapper = container.createDiv({ cls: 'timeline-wrapper' });
     
     // Create a header with a refresh button
-    const header = container.createDiv({ cls: 'timeline-header' });
+    const header = contentWrapper.createDiv({ cls: 'timeline-header' });
     
     // Add a title
     const titleContainer = header.createDiv({ cls: 'timeline-title-container' });
@@ -61,7 +68,7 @@ export class TimelineView extends ItemView {
     refreshButton.addEventListener('click', () => this.refreshTimeline());
 
     // Create the timeline content container
-    this.contentEl = container.createDiv({ cls: 'timeline-content' });
+    this.contentEl = contentWrapper.createDiv({ cls: 'timeline-content' });
     
     // Load the initial timeline data
     await this.refreshTimeline();
@@ -245,24 +252,9 @@ export class TimelineView extends ItemView {
         }
       });
       
-      // Add file path
-      const pathEl = entry.createDiv({
-        cls: 'timeline-entry-path',
-        text: note.file.path
-      });
+      // We're removing the file path display as requested
       
-      // Add a subtle open button
-      const actionButton = entry.createDiv({ cls: 'timeline-entry-button' });
-      const openButton = actionButton.createEl('button', {
-        cls: 'timeline-open-button',
-        text: 'Open',
-        attr: { 'aria-label': 'Open note' }
-      });
-      
-      openButton.addEventListener('click', (event) => {
-        event.preventDefault();
-        this.app.workspace.openLinkText(note.file.path, '', false);
-      });
+      // Open button removed as requested
     }
   }
   
