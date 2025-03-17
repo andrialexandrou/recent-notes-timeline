@@ -45,6 +45,11 @@ The plugin can automatically replace the default "No file is open" message with 
 1. You close all open files/tabs
 2. You start Obsidian with no files open
 
+This behavior can be toggled in the plugin settings:
+
+1. Go to Settings > Community Plugins > Recent Notes Timeline
+2. Enable or disable the "Replace empty state" option
+
 ## Development
 
 If you want to modify or contribute to this plugin, follow these steps:
@@ -60,13 +65,13 @@ If you want to modify or contribute to this plugin, follow these steps:
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/yourusername/obsidian-recent-notes-timeline.git
+   git clone https://github.com/andrialexandrou/recent-notes-timeline.git
    ```
 
 2. Install dependencies:
 
    ```bash
-   cd obsidian-recent-notes-timeline
+   cd recent-notes-timeline
    npm install
    ```
 
@@ -142,7 +147,7 @@ If you encounter build errors:
 
 ## Credits
 
-Developed by Andri Alexandrou and Claude
+Developed by @andrialexandrou and Claude
 
 ---
 

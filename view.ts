@@ -1,5 +1,6 @@
 import { ItemView, TFile, WorkspaceLeaf, MarkdownRenderer } from 'obsidian';
 import RecentNotesTimelinePlugin from './main';
+import RecentNotesTimelinePlugin from './main';
 
 export const VIEW_TYPE_TIMELINE = 'recent-notes-timeline-view';
 

@@ -1,8 +1,17 @@
 import { Plugin, WorkspaceLeaf } from 'obsidian';
 import { TimelineView, VIEW_TYPE_TIMELINE } from './view';
+import { TimelineSettings, DEFAULT_SETTINGS, TimelineSettingTab } from './settings';
 
 export default class RecentNotesTimelinePlugin extends Plugin {
+  settings: TimelineSettings;
+
   async onload() {
+    // Load settings
+    await this.loadSettings();
+    
+    // Add settings tab
+    this.addSettingTab(new TimelineSettingTab(this.app, this));
+
     // Register the custom view type
     this.registerView(
       VIEW_TYPE_TIMELINE,
@@ -23,17 +32,29 @@ export default class RecentNotesTimelinePlugin extends Plugin {
       },
     });
     
-    // Override the default empty state view
+    // Override the default empty state view if enabled
     this.registerEvent(
       this.app.workspace.on('active-leaf-change', () => {
-        this.checkForEmptyState();
+        if (this.settings.replaceEmptyState) {
+          this.checkForEmptyState();
+        }
       })
     );
     
-    // Initial check
-    setTimeout(() => {
-      this.checkForEmptyState();
-    }, 500);
+    // Initial check if enabled
+    if (this.settings.replaceEmptyState) {
+      setTimeout(() => {
+        this.checkForEmptyState();
+      }, 500);
+    }
+  }
+
+  async loadSettings() {
+    this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+  }
+
+  async saveSettings() {
+    await this.saveData(this.settings);
   }
 
   checkForEmptyState() {
