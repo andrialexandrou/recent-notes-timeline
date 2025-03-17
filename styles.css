@@ -133,29 +133,7 @@
   margin-bottom: 8px;
 }
 
-.timeline-entry-icon {
-  flex: 0 0 32px;
-  height: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-right: 8px;
-}
-
-.timeline-entry-icon-inner {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 16px;
-}
-
-.timeline-entry-icon-inner.created {
-  color: var(--interactive-accent);
-}
-
-.timeline-entry-icon-inner.modified {
-  color: var(--color-yellow);
-}
+/* Icon styles removed */
 
 .timeline-entry-content {
   flex: 1;
@@ -196,10 +174,52 @@
 
 .timeline-entry-preview {
   margin: 12px 0 0;
-  color: var(--text-normal);
+  padding: 12px 0 0;
+  border-top: 1px solid var(--background-modifier-border);
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+/* Adjust styles within the rendered markdown */
+.timeline-entry-preview h1,
+.timeline-entry-preview h2,
+.timeline-entry-preview h3,
+.timeline-entry-preview h4,
+.timeline-entry-preview h5,
+.timeline-entry-preview h6 {
+  margin-top: 0;
+  margin-bottom: 0.5em;
+}
+
+.timeline-entry-preview p {
+  margin-top: 0;
+  margin-bottom: 0.5em;
+}
+
+.timeline-entry-preview ul,
+.timeline-entry-preview ol {
+  margin-top: 0;
+  margin-bottom: 0.5em;
+  padding-left: 1.5em;
+}
+
+.timeline-entry-preview code {
   font-size: 0.9em;
-  line-height: 1.5;
-  opacity: 0.8;
+}
+
+.timeline-entry-preview pre {
+  padding: 8px;
+  margin: 0.5em 0;
+}
+
+.timeline-entry-preview blockquote {
+  margin: 0.5em 0;
+  padding-left: 0.75em;
+}
+
+.timeline-entry-preview img {
+  max-width: 100%;
+  max-height: 150px;
 }
 
 .timeline-entry-path {

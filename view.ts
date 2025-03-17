@@ -1,4 +1,4 @@
-import { ItemView, TFile, WorkspaceLeaf } from 'obsidian';
+import { ItemView, TFile, WorkspaceLeaf, MarkdownRenderer } from 'obsidian';
 import RecentNotesTimelinePlugin from './main';
 
 export const VIEW_TYPE_TIMELINE = 'recent-notes-timeline-view';
@@ -180,10 +180,20 @@ export class TimelineView extends ItemView {
 
   private buildTimelineUI(notes: NoteInfo[]) {
     let currentDate = '';
+    const currentYear = new Date().getFullYear();
     
     for (const note of notes) {
       const date = new Date(note.timestamp);
-      const dateString = date.toLocaleDateString();
+      
+      // Format the date as "Month Day" or "Month Day, Year" if not current year
+      const month = date.toLocaleString('en-US', { month: 'long' });
+      const day = date.getDate();
+      const year = date.getFullYear();
+      
+      let dateString = `${month} ${day}`;
+      if (year !== currentYear) {
+        dateString += `, ${year}`;
+      }
       
       // Add date separator if we've moved to a new date
       if (dateString !== currentDate) {
@@ -200,13 +210,6 @@ export class TimelineView extends ItemView {
       
       // Create the note info section
       const infoSection = entry.createDiv({ cls: 'timeline-entry-info' });
-      
-      // Add action indicator icon
-      const iconContainer = infoSection.createDiv({ cls: 'timeline-entry-icon' });
-      const iconEl = iconContainer.createEl('span', {
-        cls: `timeline-entry-icon-inner ${note.isCreated ? 'created' : 'modified'}`
-      });
-      iconEl.innerHTML = note.isCreated ? '✨' : '✏️';
       
       // Add main content container
       const contentSection = infoSection.createDiv({ cls: 'timeline-entry-content' });
@@ -246,9 +249,16 @@ export class TimelineView extends ItemView {
       this.getFilePreview(note.file).then(preview => {
         if (preview) {
           const previewEl = entry.createDiv({
-            cls: 'timeline-entry-preview',
-            text: preview
+            cls: 'timeline-entry-preview'
           });
+          
+          // Use Obsidian's Markdown renderer
+          MarkdownRenderer.renderMarkdown(
+            preview,
+            previewEl,
+            note.file.path,
+            this
+          );
         }
       });
       
@@ -258,21 +268,24 @@ export class TimelineView extends ItemView {
     }
   }
   
-  // Helper method to get a preview of the file content
+  // Helper method to get a preview of the file content for markdown rendering
   private async getFilePreview(file: TFile): Promise<string | null> {
     try {
-      // Read the first 200 characters from the file
+      // Read the entire file content
       const content = await this.app.vault.read(file);
-      const preview = content.slice(0, 200).trim();
       
-      // Remove markdown formatting for cleaner preview
-      return preview
-        .replace(/#+ /g, '') // Remove headers
-        .replace(/\*\*(.*?)\*\*/g, '$1') // Remove bold
-        .replace(/\*(.*?)\*/g, '$1') // Remove italics
-        .replace(/\[(.*?)\]\(.*?\)/g, '$1') // Remove links
-        .replace(/\n/g, ' ') // Replace newlines with spaces
-        .slice(0, 140) + (preview.length > 140 ? '...' : '');
+      // Get the lines of content (up to 7 lines)
+      const lines = content.split('\n').slice(0, 7);
+      
+      // Join the lines back together
+      let preview = lines.join('\n');
+      
+      // If there are more lines, add an indicator
+      if (content.split('\n').length > 7) {
+        preview += '\n\n*...*';
+      }
+      
+      return preview;
     } catch (error) {
       return null;
     }
