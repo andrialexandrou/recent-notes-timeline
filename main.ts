@@ -23,13 +23,36 @@ export default class RecentNotesTimelinePlugin extends Plugin {
       },
     });
     
-    // Set as a default view when no other tabs are open
-    this.app.workspace.onLayoutReady(() => {
-      // If there are no open leaf tabs, open the timeline
-      if (this.app.workspace.getLeavesOfType('markdown').length === 0) {
-        this.activateView();
-      }
-    });
+    // Override the default empty state view
+    this.registerEvent(
+      this.app.workspace.on('active-leaf-change', () => {
+        this.checkForEmptyState();
+      })
+    );
+    
+    // Initial check
+    setTimeout(() => {
+      this.checkForEmptyState();
+    }, 500);
+  }
+
+  checkForEmptyState() {
+    // Get the active leaf
+    const activeLeaf = this.app.workspace.activeLeaf;
+    
+    if (!activeLeaf) return;
+    
+    // Check if we're showing the empty state
+    const viewState = activeLeaf.getViewState();
+    
+    // Look for the empty state view type or check if the view is empty
+    if (viewState.type === 'empty') {
+      // Replace with our timeline view
+      activeLeaf.setViewState({
+        type: VIEW_TYPE_TIMELINE,
+        active: true
+      });
+    }
   }
 
   async onunload() {

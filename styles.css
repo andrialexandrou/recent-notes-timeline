@@ -1,4 +1,11 @@
-/* Timeline wrapper */
+/* Improve appearance when used as a default view */
+.workspace-leaf-content[data-type="recent-notes-timeline-view"] {
+  --header-height: 0px;
+}
+
+.workspace-tabs .workspace-leaf.mod-active .workspace-leaf-content[data-type="recent-notes-timeline-view"] {
+  background-color: var(--background-primary);
+}/* Timeline wrapper */
 .timeline-wrapper {
   max-width: 800px;
   margin: 0 auto;
