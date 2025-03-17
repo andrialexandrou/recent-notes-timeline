@@ -34,7 +34,7 @@ There are several ways to access your Recent Notes Timeline:
 
 ### As a Regular View
 
-- Click the clock icon in the ribbon sidebar
+- Click the Recent Notes Timeline icon in the ribbon sidebar
 - Use the command palette and search for "Show Recent Notes Timeline"
 - Create a hotkey in Obsidian settings for quick access
 

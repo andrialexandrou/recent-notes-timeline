@@ -19,7 +19,7 @@ export default class RecentNotesTimelinePlugin extends Plugin {
     );
 
     // Add a ribbon icon to open the timeline in a new tab
-    this.addRibbonIcon('clock', 'Recent Notes Timeline', () => {
+    this.addRibbonIcon('rows-4', 'Recent Notes Timeline', () => {
       this.activateView();
     });
 
