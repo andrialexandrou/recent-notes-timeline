@@ -2,6 +2,8 @@
 
 A clean, Twitter-like timeline view of your recently edited and created notes in Obsidian.
 
+![A screenshot of a notes timeline interface showing four recent entries dated March 17. The entries are titled "Robotics Project," "Math Paradoxes," "Astronomy Obs Log," and "Home Chem Experiments," each with timestamps around 11:47-11:48 AM. The interface has options to view 10 entries from today, this week, or this month. Each note contains detailed text about its respective topic, including project milestones, Simpson's Paradox explanation, Pleiades observation details, and a nylon synthesis experiment description. Each entry is encased in a card, presented linearly, with most recent at the top.](./assets/demo.png)
+
 ## Features
 
 - Shows a chronological timeline of recently modified and created notes
