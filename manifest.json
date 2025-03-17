@@ -1,0 +1,10 @@
+{
+  "id": "recent-notes-timeline",
+  "name": "Recent Notes Timeline",
+  "version": "1.0.0",
+  "minAppVersion": "0.15.0",
+  "description": "Displays a Twitter-like timeline of recently created or edited notes.",
+  "author": "Your Name",
+  "authorUrl": "https://github.com/yourusername",
+  "isDesktopOnly": false
+}

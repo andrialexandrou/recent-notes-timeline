@@ -1,0 +1,128 @@
+/* Main container styles */
+.recent-notes-timeline {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* Header styles */
+.timeline-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 16px;
+  border-bottom: 1px solid var(--background-modifier-border);
+}
+
+.timeline-header h3 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.timeline-refresh-button {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 16px;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.timeline-refresh-button:hover {
+  color: var(--text-normal);
+  background-color: var(--background-modifier-hover);
+}
+
+.timeline-refresh-button:focus {
+  outline: 2px solid var(--interactive-accent);
+}
+
+/* Timeline content */
+.timeline-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 16px;
+}
+
+/* Date separator */
+.timeline-date-separator {
+  font-weight: bold;
+  padding: 16px 0 8px;
+  position: sticky;
+  top: 0;
+  background-color: var(--background-primary);
+  z-index: 1;
+  border-bottom: 1px solid var(--background-modifier-border);
+}
+
+/* Timeline entry */
+.timeline-entry {
+  position: relative;
+  padding: 12px 0 12px 24px;
+  border-left: 2px solid var(--background-modifier-border);
+  margin-left: 8px;
+}
+
+.timeline-entry:before {
+  content: '';
+  position: absolute;
+  left: -6px;
+  top: 16px;
+  width: 10px;
+  height: 10px;
+  background-color: var(--background-modifier-border);
+  border-radius: 50%;
+}
+
+.timeline-entry:hover:before {
+  background-color: var(--interactive-accent);
+}
+
+/* Entry info section */
+.timeline-entry-info {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.timeline-entry-title {
+  font-weight: bold;
+  color: var(--text-normal);
+  text-decoration: none;
+}
+
+.timeline-entry-title:hover {
+  text-decoration: underline;
+  color: var(--interactive-accent);
+}
+
+.timeline-entry-time {
+  color: var(--text-muted);
+  font-size: 0.85em;
+}
+
+.timeline-entry-action {
+  font-size: 0.85em;
+  background-color: var(--background-modifier-hover);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.timeline-entry-path {
+  color: var(--text-muted);
+  font-size: 0.8em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Empty state */
+.timeline-empty-message {
+  text-align: center;
+  color: var(--text-muted);
+  padding: 32px 16px;
+}
